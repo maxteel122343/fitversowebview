@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#17232e">
+  <title>FitVerso | Seu coach de treino</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --navy: #17232e;
+      --navy-2: #22313d;
+      --teal: #438f92;
+      --teal-soft: #e2f1f0;
+      --green: #318a68;
+      --yellow: #a8740d;
+      --red: #bf4c4c;
+      --ink: #17232e;
+      --muted: #71808a;
+      --line: #e1e7eb;
+      --page: #f2f5f7;
+      --white: #fff;
+      --shadow: 0 7px 25px rgba(20, 38, 51, .055);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--page); color: var(--ink);
+      font: 15px/1.45 Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .layout { min-height: 100vh; display: flex; }
+    .sidebar {
+      width: 248px; flex: 0 0 248px; padding: 22px 14px;
+      background: var(--navy); color: white; display: flex; flex-direction: column;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 5px 13px 28px; font-size: 21px; font-weight: 750; }
+    .brand-mark { width: 32px; height: 32px; display: grid; place-items: center; color: #62c6bd; font-size: 28px; font-weight: 900; }
+    .nav { display: grid; gap: 5px; }
+    .nav button {
+      border: 0; border-radius: 10px; padding: 12px 13px; text-align: left;
+      color: #d3dee4; background: transparent; transition: background .15s, color .15s;
+    }
+    .nav button:hover { background: #283944; color: white; }
+    .nav button.active { background: #367f83; color: white; }
+    .nav-icon { display: inline-block; width: 27px; opacity: .9; }
+    .privacy-note { margin: auto 11px 8px; padding-top: 20px; border-top: 1px solid #35444e; color: #aebdc5; font-size: 12px; }
+    .main { flex: 1; min-width: 0; }
+    .topbar { height: 72px; display: flex; align-items: center; justify-content: space-between; padding: 0 34px; }
+    .topbar h1 { margin: 0; font-size: 21px; }
+    .connection { color: var(--muted); font-size: 13px; }
+    .connection.online { color: var(--green); }
+    .content { max-width: 1440px; margin: auto; padding: 4px 34px 34px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .greeting { margin: 0 0 18px; font-size: clamp(22px, 3vw, 29px); }
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+    .grid { display: grid; gap: 16px; }
+    .grid.metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 17px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card {
+      min-width: 0; padding: 19px; background: var(--white); border: 1px solid var(--line);
+      border-radius: 15px; box-shadow: var(--shadow);
+    }
+    .card h2, .card h3 { margin: 0 0 11px; }
+    .metric-label { color: var(--muted); font-size: 13px; }
+    .metric-value { margin: 7px 0 2px; font-size: 30px; font-weight: 750; letter-spacing: -.5px; }
+    .metric-sub { color: var(--muted); font-size: 12px; }
+    .welcome-card { padding: clamp(20px, 4vw, 34px); }
+    .welcome-card p { color: var(--muted); }
+    .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+    .btn {
+      border: 1px solid transparent; border-radius: 10px; padding: 10px 15px;
+      background: #e9eef1; color: var(--ink); font-weight: 650;
+    }
+    .btn:hover { filter: brightness(.97); }
+    .btn.primary { color: white; background: var(--teal); }
+    .btn.danger { color: white; background: var(--red); }
+    .btn.outline { background: white; border-color: var(--line); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 15px; }
+    .field, select.field {
+      min-height: 42px; border: 1px solid var(--line); border-radius: 9px;
+      background: white; color: var(--ink); padding: 8px 11px; outline: none;
+    }
+    .field:focus { border-color: var(--teal); box-shadow: 0 0 0 3px #438f921d; }
+    .toolbar .field { min-width: 150px; }
+    .live-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(270px, .75fr); gap: 15px; }
+    .live-image {
+      display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain;
+      border-radius: 11px; background: #202a33; color: white;
+    }
+    .pose-canvas {
+      display: block; width: 100%; max-height: 70vh; object-fit: contain;
+      border-radius: 11px; background: #202a33;
+    }
+    .avatar-image { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: contain; border-radius: 11px; background: #202a33; }
+    .avatar-canvas { display: block; width: 100%; aspect-ratio: 3 / 4; border-radius: 11px; background: #202a33; }
+    .visual-frame { position: relative; overflow: hidden; border-radius: 11px; background: #202a33; }
+    .visual-placeholder {
+      display: grid; place-items: center; aspect-ratio: 4 / 3; padding: 18px;
+      color: #d3dee4; text-align: center; font-size: 13px;
+    }
+    .avatar-placeholder { aspect-ratio: 3 / 4; }
+    .live-stats { display: grid; gap: 11px; margin-top: 12px; }
+    .rep-number { font-size: 51px; line-height: 1; color: var(--green); font-weight: 800; }
+    .feedback { padding: 11px 12px; border-radius: 9px; background: var(--teal-soft); color: var(--green); font-weight: 650; }
+    .feedback.warn { color: var(--yellow); background: #fff4d8; }
+    .feedback.bad { color: var(--red); background: #fde9e8; }
+    .exercise-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .exercise-card { display: flex; flex-direction: column; min-height: 188px; }
+    .exercise-card p { flex: 1; }
+    .tag { display: inline-flex; padding: 4px 8px; border-radius: 999px; background: var(--teal-soft); color: #347b7e; font-size: 11px; font-weight: 650; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 590px; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 12px; font-weight: 650; }
+    tr[data-id] { cursor: pointer; }
+    tr[data-id]:hover { background: #f7fafb; }
+    .chart { min-height: 230px; display: flex; align-items: end; gap: clamp(7px, 2vw, 18px); padding: 20px 10px 5px; border-bottom: 1px solid var(--line); }
+    .bar-item { flex: 1; min-width: 15px; display: grid; grid-template-rows: 1fr auto; height: 190px; text-align: center; }
+    .bar-track { height: 160px; display: flex; align-items: end; justify-content: center; }
+    .bar { width: min(44px, 72%); min-height: 3px; border-radius: 7px 7px 0 0; background: var(--teal); }
+    .bar-label { margin-top: 7px; color: var(--muted); font-size: 11px; }
+    .model-list { display: grid; gap: 11px; }
+    .model-card { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 15px; align-items: center; }
+    .model-card h3 { margin: 0 0 4px; }
+    .model-status { color: var(--muted); font-size: 12px; }
+    .license { padding: 13px 15px; border-radius: 10px; background: #fff5dc; color: #785919; font-size: 12px; }
+    .form-grid { display: grid; grid-template-columns: minmax(180px, 240px) minmax(180px, 1fr); align-items: center; gap: 12px 16px; }
+    .check-row { display: flex; align-items: flex-start; gap: 9px; margin-top: 14px; font-size: 13px; }
+    .privacy-cards { margin-top: 15px; }
+    .notice { margin: 10px 0 15px; padding: 11px 13px; border-radius: 9px; background: #eaf3f3; color: #386e70; font-size: 13px; }
+    .empty { color: var(--muted); padding: 20px 0; }
+    .hidden { display: none !important; }
+    .login-shade {
+      position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px;
+      background: rgba(15, 27, 37, .82); backdrop-filter: blur(7px);
+    }
+    .login-card { width: min(420px, 100%); background: white; border-radius: 18px; padding: 27px; box-shadow: 0 18px 70px #0004; }
+    .login-card h2 { margin: 0 0 8px; }
+    .login-card .field { width: 100%; margin: 12px 0; }
+    .login-card .btn { width: 100%; }
+    .toast { position: fixed; z-index: 25; right: 20px; bottom: 20px; max-width: min(440px, calc(100vw - 40px)); padding: 13px 16px; border-radius: 10px; color: white; background: var(--navy); box-shadow: var(--shadow); }
+    .mobile-nav { display: none; }
+    @media (max-width: 900px) {
+      .sidebar { width: 215px; flex-basis: 215px; }
+      .content { padding-right: 22px; padding-left: 22px; }
+      .topbar { padding: 0 22px; }
+      .live-grid { grid-template-columns: minmax(0, 1.3fr) minmax(230px, .7fr); }
+    }
+    @media (max-width: 700px) {
+      .layout { display: block; min-height: 100dvh; padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+      .sidebar { display: none; }
+      .main { min-height: 100dvh; }
+      .topbar { height: 58px; padding: 0 16px; }
+      .topbar h1 { font-size: 18px; }
+      .connection { font-size: 11px; }
+      .content { padding: 6px 14px 20px; }
+      .grid.metrics { grid-template-columns: 1fr 1fr; gap: 9px; }
+      .grid.metrics .card:last-child { grid-column: span 2; }
+      .card { padding: 15px; border-radius: 13px; }
+      .metric-value { font-size: 25px; }
+      .live-grid { grid-template-columns: 1fr; }
+      .live-grid > .card:last-child { display: grid; grid-template-columns: minmax(110px, .65fr) minmax(0, 1fr); gap: 11px; align-items: start; }
+      .live-grid > .card:last-child > h2 { grid-column: 1 / -1; margin: 0; }
+      .avatar-image { aspect-ratio: 1 / 1.2; }
+      .live-stats { margin-top: 0; }
+      .exercise-grid { grid-template-columns: 1fr; }
+      .exercise-card { min-height: 155px; }
+      .form-grid { grid-template-columns: 1fr; gap: 6px; }
+      .form-grid .field { margin-bottom: 9px; }
+      .model-card { grid-template-columns: 1fr; }
+      .model-card .btn { width: 100%; }
+      .toolbar .field { flex: 1; min-width: 125px; }
+      .mobile-nav {
+        position: fixed; z-index: 10; bottom: 0; left: 0; right: 0;
+        display: flex; justify-content: space-around; gap: 3px; overflow-x: auto;
+        padding: 7px 5px calc(7px + env(safe-area-inset-bottom));
+        background: var(--navy); border-top: 1px solid #34434e;
+      }
+      .mobile-nav button {
+        flex: 1 1 0; min-width: 0; border: 0; border-radius: 8px; padding: 6px 2px;
+        background: transparent; color: #c4d0d6; font-size: 9px; line-height: 1.15;
+      }
+      .mobile-nav button.active { background: var(--sidebar-active, #367f83); color: white; }
+      .mobile-nav .nav-icon { display: block; width: auto; font-size: 16px; margin-bottom: 3px; }
+    }
+  </style>
+  <script type="importmap">
+    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.174.0/build/three.module.js"}}
+  </script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">F</span><span>FitVerso</span></div>
+      <nav class="nav" id="sideNav"></nav>
+      <div class="privacy-note" id="privacyNote">Pose no aparelho<br>No modo leve, o vídeo não sai do navegador.</div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <h1 id="pageTitle">Início</h1>
+        <div class="connection" id="connection">● Câmera desconectada</div>
+      </header>
+      <div class="content">
+        <section class="page active" id="page-home">
+          <h2 class="greeting" id="greeting">Olá! Vamos treinar hoje?</h2>
+          <div class="grid metrics">
+            <article class="card"><div class="metric-label">Treinos nos últimos 7 dias</div><div class="metric-value" id="weekSessions">0</div><div class="metric-sub" id="weekGoal">Meta: 3 por semana</div></article>
+            <article class="card"><div class="metric-label">Repetições nesta semana</div><div class="metric-value" id="weekReps">0</div><div class="metric-sub">Contadas nos seus treinos</div></article>
+            <article class="card"><div class="metric-label">Último treino</div><div class="metric-value" id="lastWorkout">Ainda não</div><div class="metric-sub" id="lastWorkoutDetail">Seu histórico aparece aqui</div></article>
+          </div>
+          <article class="card welcome-card">
+            <h2>Seu próximo treino</h2>
+            <p>Escolha um exercício e receba orientação visual durante o movimento.</p>
+            <div class="actions"><button class="btn primary" data-go="Treino ao vivo">Começar treino</button><button class="btn outline" data-go="Exercícios">Ver exercícios</button></div>
+          </article>
+          <article class="card" style="margin-top:15px">
+            <h3>Dica para começar</h3>
+            <p class="muted">Posicione a câmera para que seu corpo inteiro fique visível e deixe espaço para se movimentar.</p>
+          </article>
+        </section>
+
+        <section class="page" id="page-live">
+          <div class="toolbar card">
+            <label for="liveExercise">Exercício</label>
+            <select class="field" id="liveExercise"></select>
+            <label for="inferenceMode">Pose</label>
+            <select class="field" id="inferenceMode">
+              <option value="device">Leve · neste aparelho</option>
+              <option value="instanthmr">InstantHMR · servidor/GPU</option>
+            </select>
+            <label for="facingMode">Câmera</label>
+            <select class="field" id="facingMode"><option value="user">Frontal</option><option value="environment">Traseira</option></select>
+            <button class="btn primary" id="startButton">Iniciar treino</button>
+            <button class="btn" id="pauseButton" disabled>Pausar</button>
+            <button class="btn outline" id="resetButton" disabled>Zerar</button>
+            <button class="btn danger" id="stopButton" disabled>Encerrar</button>
+          </div>
+          <div class="notice" id="cameraNotice">Ao atualizar a página, o navegador desconecta a câmera por privacidade. Toque em “Iniciar treino” para conectá-la novamente; no celular, use HTTPS e permita o acesso à câmera.</div>
+          <div class="live-grid">
+            <article class="card">
+              <h2>Câmera e movimento</h2>
+              <canvas id="captureCanvas" class="hidden"></canvas>
+              <div class="visual-frame">
+                <canvas id="poseCanvas" class="pose-canvas hidden" aria-label="Câmera com esqueleto detectado"></canvas>
+                <img id="coachImage" class="live-image hidden" alt="Imagem do treino com skeleton e feedback">
+                <div class="visual-placeholder" id="coachPlaceholder">A câmera e o skeleton aparecem aqui quando o treino começar.</div>
+              </div>
+              <p class="muted small" id="liveStatus">Pronto para começar. Selecione um exercício e toque em “Iniciar treino”.</p>
+            </article>
+            <article class="card">
+              <h2>Seu avatar</h2>
+              <div class="visual-frame">
+                <canvas id="avatarCanvas" class="avatar-canvas hidden" aria-label="Avatar 3D acompanhando sua pose"></canvas>
+                <img id="avatarImage" class="avatar-image hidden" alt="Avatar 3D acompanhando sua pose">
+                <div class="visual-placeholder avatar-placeholder" id="avatarPlaceholder">Seu avatar 3D aparece aqui.</div>
+              </div>
+              <div class="live-stats">
+                <div><div class="metric-label">Repetições</div><div class="rep-number" id="repCount">00</div></div>
+                <div class="metric-label" id="angleValue">Ângulo: --</div>
+                <div class="feedback" id="feedback">Aguardando o treino</div>
+                <div class="metric-sub" id="liveTimer">00:00 · -- FPS</div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="page" id="page-exercises">
+          <h2>Escolha um exercício para começar</h2>
+          <p class="muted">Selecione manualmente nesta versão. Detecção automática está planejada.</p>
+          <div class="toolbar">
+            <input class="field" id="exerciseSearch" placeholder="Buscar exercício..." aria-label="Buscar exercício">
+            <select class="field" id="groupFilter"><option>Todos os grupos</option><option>Pernas</option><option>Peito e braços</option><option>Bíceps</option></select>
+            <select class="field" id="levelFilter"><option>Todos os níveis</option><option>Iniciante</option><option>Intermediário</option></select>
+          </div>
+          <div class="exercise-grid" id="exerciseGrid"></div>
+        </section>
+
+        <section class="page" id="page-history">
+          <div class="toolbar">
+            <select class="field" id="periodFilter"><option value="0">Todos os períodos</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option></select>
+            <select class="field" id="historyExerciseFilter"><option value="">Todos os exercícios</option></select>
+            <button class="btn outline" id="csvButton">Exportar CSV</button>
+          </div>
+          <article class="card table-wrap">
+            <table><thead><tr><th>Data e hora</th><th>Exercícios</th><th>Duração</th><th>Repetições</th></tr></thead><tbody id="historyRows"></tbody></table>
+            <p class="empty hidden" id="historyEmpty">Nenhum treino encontrado. Inicie seu primeiro treino para ver o histórico aqui.</p>
+            <p class="muted small" id="historyDetail">Selecione um treino para ver os detalhes.</p>
+          </article>
+        </section>
+
+        <section class="page" id="page-progress">
+          <div class="grid metrics">
+            <article class="card"><div class="metric-label">Treinos nos últimos 7 dias</div><div class="metric-value" id="progressSessions">0</div></article>
+            <article class="card"><div class="metric-label">Repetições nos últimos 7 dias</div><div class="metric-value" id="progressReps">0</div></article>
+            <article class="card"><div class="metric-label">Meta semanal</div><div class="metric-value" id="progressGoal">0/3</div></article>
+          </div>
+          <article class="card"><h2>Treinos por dia · últimos 7 dias</h2><div class="chart" id="progressChart"></div><p class="muted small">Os dados mostram apenas treinos registrados neste dispositivo.</p></article>
+        </section>
+
+        <section class="page" id="page-models">
+          <p class="muted">Baixe e escolha o modelo que gera o avatar. O primeiro download pode levar alguns minutos e exige conexão com a internet.</p>
+          <div class="toolbar card">
+            <label for="modelSelect">Modelo selecionado</label><select class="field" id="modelSelect"></select>
+            <label for="fitSelect">Ajuste</label><select class="field" id="fitSelect"><option value="0">Básico · mais rápido</option><option value="1">Recomendado</option><option value="2">Aprimorado · mais detalhado</option></select>
+            <label for="deviceSelect">Dispositivo</label><select class="field" id="deviceSelect"><option value="cpu">CPU</option><option value="cuda">GPU CUDA</option><option value="tensorrt">TensorRT</option></select>
+            <button class="btn outline" id="saveModelSettings">Salvar preferência</button>
+          </div>
+          <div class="model-list" id="modelList"></div>
+          <p class="license" style="margin-top:14px">Licenças: Nano, Tiny, Small e Medium têm restrição para uso não comercial. Medium Commercial também está sujeito aos termos da licença SAM. Confira as licenças antes de usar ou distribuir.</p>
+        </section>
+
+        <section class="page" id="page-profile">
+          <article class="card">
+            <h2>Suas preferências</h2>
+            <div class="form-grid">
+              <label for="profileName">Como podemos chamar você?</label><input class="field" id="profileName" maxlength="80">
+              <label for="weeklyGoalSelect">Meta de treinos por semana</label><select class="field" id="weeklyGoalSelect"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select>
+              <label for="profileCamera">Câmera padrão</label><select class="field" id="profileCamera"><option value="user">Frontal</option><option value="environment">Traseira</option></select>
+            </div>
+            <label class="check-row"><input type="checkbox" id="snapshotsEnabled"> Salvar snapshots de pose para análise e recursos futuros do coach</label>
+            <p class="muted small">Lembretes de treino: Em breve.</p>
+            <button class="btn primary" id="saveProfile">Salvar preferências</button>
+          </article>
+          <article class="card privacy-cards">
+            <h2>Privacidade e seus dados</h2>
+            <p class="muted" id="privacyDetail">No modo leve, a pose é estimada neste aparelho e o vídeo não sai do navegador. O modo InstantHMR envia frames ao servidor configurado. No uso local, histórico e snapshots ficam no computador que executa o app.</p>
+            <div class="actions"><button class="btn outline" id="exportData">Exportar todos os dados (.zip)</button><button class="btn danger" id="deleteData">Excluir histórico e snapshots</button></div>
+            <button class="btn outline hidden" id="signOutButton" style="margin-top:12px">Sair da conta</button>
+          </article>
+        </section>
+      </div>
+    </main>
+  </div>
+  <nav class="mobile-nav" id="mobileNav"></nav>
+  <video id="cameraSource" class="hidden" autoplay playsinline muted></video>
+  <div class="login-shade" id="loginShade">
+    <form class="login-card" id="loginForm">
+      <div class="brand" style="padding:0 0 12px;color:#17232e"><span class="brand-mark">F</span><span>FitVerso</span></div>
+      <h2>Conectar ao seu FitVerso</h2>
+      <p class="muted" id="loginDescription">Digite o código de acesso exibido no terminal do computador que está executando o app.</p>
+      <div id="localLogin">
+        <input class="field" id="accessCode" type="password" autocomplete="current-password" required>
+        <button class="btn primary" type="submit">Entrar</button>
+      </div>
+      <div id="cloudLogin" class="hidden">
+        <input class="field" id="authEmail" type="email" autocomplete="email" placeholder="Seu e-mail" required disabled>
+        <input class="field" id="authPassword" type="password" autocomplete="current-password" placeholder="Senha" minlength="8" required disabled>
+        <button class="btn primary" type="submit" id="authSubmit" disabled>Entrar</button>
+        <button class="btn outline" type="button" id="createAccount" disabled>Criar conta</button>
+      </div>
+      <p class="muted small" id="loginError"></p>
+    </form>
+  </div>
+  <div class="toast hidden" id="toast"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.2/dist/umd/supabase.js"></script>
+  <script>
+    const LOCAL_COACH_SCRIPT = "/local_coach.js";
+    const EXERCISES = [
+      {id:"squat", name:"Agachamento", group:"Pernas", level:"Iniciante", text:"Agachamento controlado, acompanhando o ângulo do joelho."},
+      {id:"pushup", name:"Flexão", group:"Peito e braços", level:"Intermediário", text:"Mantenha o corpo alinhado durante a flexão."},
+      {id:"bicep_curl", name:"Rosca de bíceps", group:"Bíceps", level:"Iniciante", text:"Flexione o cotovelo sem acelerar o movimento."},
+      {id:"lunge", name:"Avanço", group:"Pernas", level:"Intermediário", text:"Avance com controle e mantenha o equilíbrio."},
+    ];
+    const NAV = [
+      ["Início","⌂","home"],["Treino ao vivo","◉","live"],["Exercícios","▦","exercises"],
+      ["Histórico","◷","history"],["Progresso","↗","progress"],["Modelos de IA","⬇","models"],
+      ["Perfil","♙","profile"],
+    ];
+    const LABELS = Object.fromEntries(EXERCISES.map(item => [item.id,item.name]));
+    const state = {code:"", profile:{}, history:[], socket:null, stream:null, running:false,
+      paused:false, waiting:false, binaryPart:0, lastSent:0, raf:0, page:"home",
+      cameraUrl:"", avatarUrl:"", models:[], localCoach:null, mode:"device",
+      startedAt:null, localReps:{}, lastSnapshotAt:0, supabase:null, user:null,
+      cloudConfig:null, snapshotWritesFailed:false, sessionId:null, previewMode:false};
+    const PREVIEW_PROFILE_KEY="fitverso_preview_profile_v1";
+    const PREVIEW_HISTORY_KEY="fitverso_preview_history_v1";
+    const PREVIEW_SNAPSHOTS_KEY="fitverso_preview_snapshots_v1";
+    const $ = id => document.getElementById(id);
+    const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[char]));
+    const duration = seconds => {
+      const value = Math.max(0,Math.floor(Number(seconds)||0));
+      return `${String(Math.floor(value/60)).padStart(2,"0")}:${String(value%60).padStart(2,"0")}`;
+    };
+    const notify = (text, error=false) => {
+      const toast=$("toast"); toast.textContent=text; toast.style.background=error?"#a83f3f":"#17232e";
+      toast.classList.remove("hidden"); clearTimeout(notify.timer); notify.timer=setTimeout(()=>toast.classList.add("hidden"),4500);
+    };
+    function previewRead(key,fallback) {
+      const value=localStorage.getItem(key);
+      if(value===null) return fallback;
+      try { return JSON.parse(value); }
+      catch(error) { throw new Error(`Os dados locais do app estão inválidos: ${error.message}`); }
+    }
+    function previewWrite(key,value) {
+      localStorage.setItem(key,JSON.stringify(value));
+    }
+    function previewJson(data,status=200) {
+      return new Response(JSON.stringify(data),{status,headers:{"Content-Type":"application/json"}});
+    }
+    async function previewApi(path,options={}) {
+      const url=new URL(path,location.origin);
+      const method=(options.method||"GET").toUpperCase();
+      if(url.pathname==="/api/ping"&&method==="GET") return previewJson({ok:true});
+      if(url.pathname==="/api/profile") {
+        if(method==="GET") return previewJson(previewRead(PREVIEW_PROFILE_KEY,{
+          name:"Atleta",weekly_goal:3,model:"small",fit:1,device:"cpu",
+          camera_mode:"user",snapshots_enabled:true,inference_mode:"device",
+        }));
+        if(method==="PUT") {
+          previewWrite(PREVIEW_PROFILE_KEY,JSON.parse(options.body||"{}"));
+          return previewJson({saved:true});
+        }
+      }
+      if(url.pathname==="/api/history"&&method==="GET")
+        return previewJson(previewRead(PREVIEW_HISTORY_KEY,[]));
+      if(url.pathname==="/api/workouts"&&method==="POST") {
+        const workout=JSON.parse(options.body||"{}");
+        const reps=workout.reps_by_exercise||{};
+        const record={
+          id:crypto.randomUUID(),
+          started_at:workout.started_at,
+          duration_seconds:Math.max(0,Math.round(Number(workout.duration_seconds)||0)),
+          reps_by_exercise:reps,
+          total_reps:Object.values(reps).reduce((sum,value)=>sum+Math.max(0,Number(value)||0),0),
+        };
+        const history=previewRead(PREVIEW_HISTORY_KEY,[]);
+        history.unshift(record);
+        previewWrite(PREVIEW_HISTORY_KEY,history);
+        return previewJson(record,201);
+      }
+      if(url.pathname==="/api/snapshots"&&method==="POST") {
+        const snapshots=previewRead(PREVIEW_SNAPSHOTS_KEY,[]);
+        if(snapshots.length>=300)
+          return previewJson({detail:"Limite de 300 snapshots locais atingido. Exporte ou apague os dados para continuar."},507);
+        snapshots.push(JSON.parse(options.body||"{}"));
+        previewWrite(PREVIEW_SNAPSHOTS_KEY,snapshots);
+        return previewJson({saved:true},201);
+      }
+      if(url.pathname==="/api/export.csv"&&method==="GET") {
+        const columns=["id","started_at","duration_seconds","total_reps","reps_by_exercise"];
+        const quote=value=>`"${String(value??"").replaceAll('"','""')}"`;
+        const lines=[columns.map(quote).join(",")];
+        for(const row of previewRead(PREVIEW_HISTORY_KEY,[]))
+          lines.push(columns.map(column=>quote(column==="reps_by_exercise"
+            ?JSON.stringify(row[column]||{}):row[column])).join(","));
+        return new Response("\uFEFF"+lines.join("\r\n"),{headers:{"Content-Type":"text/csv;charset=utf-8"}});
+      }
+      if(url.pathname==="/api/data"&&method==="DELETE") {
+        localStorage.removeItem(PREVIEW_HISTORY_KEY);
+        localStorage.removeItem(PREVIEW_SNAPSHOTS_KEY);
+        return previewJson({deleted:true});
+      }
+      return previewJson({detail:"Este recurso não está disponível na demonstração hospedada."},501);
+    }
+    async function api(path, options={}) {
+      const response=state.previewMode
+        ?await previewApi(path,options)
+        :await fetch(path,{...options,headers:{"X-FitVerso-Code":state.code,...(options.headers||{})}});
+      if(!response.ok) {
+        let detail=`Falha na solicitação (${response.status}).`;
+        try { const body=await response.json(); detail=body.detail||detail; } catch {}
+        throw new Error(detail);
+      }
+      return response;
+    }
+    function setAuthMode(cloud) {
+      $("localLogin").classList.toggle("hidden",cloud);
+      $("cloudLogin").classList.toggle("hidden",!cloud);
+      $("accessCode").disabled=cloud;$("accessCode").required=!cloud;
+      $("authEmail").disabled=!cloud;$("authPassword").disabled=!cloud;
+      $("authEmail").required=cloud;$("authPassword").required=cloud;
+      $("authSubmit").disabled=!cloud;$("createAccount").disabled=!cloud;
+      $("loginDescription").textContent=cloud
+        ?"Entre ou crie uma conta para manter seu histórico privado no Supabase."
+        :"Digite o código de acesso exibido no terminal do computador que está executando o app.";
+      $("signOutButton").classList.toggle("hidden",!cloud);
+      if(cloud) $("exportData").textContent="Exportar dados (.json)";
+    }
+
+    async function loadCloudUser(session) {
+      state.user=session.user;
+      const defaults={
+        id:state.user.id,
+        name:state.user.user_metadata?.name||"Atleta",
+        weekly_goal:3,
+        model:"small",
+        fit:1,
+        device:"cpu",
+        camera_mode:"user",
+        snapshots_enabled:true,
+        inference_mode:"device",
+      };
+      const {data:profile,error:profileError}=await state.supabase
+        .from("profiles").select("*").eq("id",state.user.id).maybeSingle();
+      if(profileError) throw profileError;
+      if(profile) state.profile=profile;
+      else {
+        const {data:createdProfile,error}=await state.supabase
+          .from("profiles").upsert(defaults,{onConflict:"id"}).select().single();
+        if(error) throw error;
+        state.profile=createdProfile;
+      }
+      if(!$("modelSelect").options.length) {
+        $("modelSelect").innerHTML=[
+          ["small","Small"],["tiny","Tiny"],["nano","Nano"],
+          ["medium","Medium"],["medium-commercial","Medium Commercial"],
+        ].map(([value,label])=>`<option value="${value}">${label}</option>`).join("");
+      }
+      const {data:history,error:historyError}=await state.supabase
+        .from("workout_sessions")
+        .select("id,started_at,duration_seconds,reps_by_exercise,total_reps")
+        .order("started_at",{ascending:true});
+      if(historyError) throw historyError;
+      state.history=history||[];
+      $("loginShade").classList.add("hidden");
+      const instantOption=$("inferenceMode").querySelector('option[value="instanthmr"]');
+      instantOption.disabled=true;
+      instantOption.textContent="InstantHMR · GPU (servidor a configurar)";
+      $("modelList").innerHTML='<article class="card"><p class="muted">Os modelos InstantHMR continuam disponíveis no modo local. O site usa pose leve no aparelho; a conexão ao servidor GPU será habilitada quando o backend especializado estiver configurado.</p></article>';
+      $("privacyNote").textContent="Sua pose é processada no aparelho. Perfil e treinos ficam na sua conta Supabase.";
+      $("privacyDetail").textContent="O vídeo é processado no navegador e não é enviado. Perfil, sessões e snapshots de keypoints ficam na sua conta Supabase, protegidos por políticas RLS.";
+      $("exportData").textContent="Exportar dados (.json)";
+      applyProfile();renderDashboard();renderExercises();renderHistory();renderProgress();
+    }
+
+    async function signInSupabase(email,password) {
+      $("loginError").textContent="";
+      const {data,error}=await state.supabase.auth.signInWithPassword({email,password});
+      if(error) throw error;
+      await loadCloudUser(data.session);
+    }
+
+    async function createSupabaseAccount(email,password) {
+      $("loginError").textContent="";
+      const {data,error}=await state.supabase.auth.signUp({email,password});
+      if(error) throw error;
+      if(data.session) await loadCloudUser(data.session);
+      else $("loginError").textContent="Conta criada. Confirme o e-mail antes de entrar.";
+    }
+
+    async function initializeApp() {
+      setupNav();fillExerciseOptions();renderExercises();setupEvents();
+      try {
+        const response=await fetch("/api/config");
+        if(!response.ok) throw new Error(`Não foi possível carregar a configuração (${response.status}).`);
+        const config=await response.json();
+        if(config.supabase_url&&config.supabase_anon_key) {
+          if(!window.supabase?.createClient) throw new Error("O cliente Supabase não carregou. Verifique a conexão e recarregue.");
+          state.supabase=window.supabase.createClient(config.supabase_url,config.supabase_anon_key);
+          state.cloudConfig=config;
+          setAuthMode(true);
+          const {data,error}=await state.supabase.auth.getSession();
+          if(error) throw error;
+          if(data.session) await loadCloudUser(data.session);
+          else $("loginShade").classList.remove("hidden");
+          return;
+        }
+        if(config.preview_mode) {
+          state.previewMode=true;
+          setAuthMode(false);
+          $("inferenceMode").querySelector('option[value="instanthmr"]').disabled=true;
+          $("inferenceMode").querySelector('option[value="instanthmr"]').textContent="InstantHMR · requer servidor";
+          $("privacyNote").textContent="Demonstração: pose processada neste aparelho.";
+          $("privacyDetail").textContent="Câmera, perfil, treinos e snapshots permanecem neste navegador. Esta demonstração não sincroniza dados e não inclui o backend InstantHMR/GPU.";
+          await login("browser-preview");
+          return;
+        }
+      } catch(error) {
+        $("loginShade").classList.remove("hidden");
+        $("loginError").textContent=`Configuração do app: ${error.message}`;
+        return;
+      }
+      setAuthMode(false);
+      $("accessCode").value=sessionStorage.getItem("fitverso-code")||"";
+      if($("accessCode").value) login($("accessCode").value).catch(()=>sessionStorage.removeItem("fitverso-code"));
+      else $("loginShade").classList.remove("hidden");
+    }
+    function setupNav() {
+      for (const [label,icon,page] of NAV) {
+        for (const target of [$("sideNav"),$("mobileNav")]) {
+          const button=document.createElement("button"); button.dataset.page=page;
+          const shortLabels={live:"Ao vivo",exercises:"Exercícios",history:"Histórico",progress:"Progresso",models:"Modelos"};
+          const visibleLabel=target.id==="mobileNav"?(shortLabels[page]||label):label;
+          button.setAttribute("aria-label",label);
+          button.innerHTML=`<span class="nav-icon">${icon}</span>${visibleLabel}`;
+          button.addEventListener("click",()=>showPage(page)); target.append(button);
+        }
+      }
+      document.querySelectorAll("[data-go]").forEach(button=>button.addEventListener("click",()=>{
+        const page=button.dataset.go==="Exercícios"?"exercises":"live"; showPage(page);
+      }));
+    }
+    function showPage(page) {
+      state.page=page;
+      document.querySelectorAll(".page").forEach(section=>section.classList.toggle("active",section.id===`page-${page}`));
+      document.querySelectorAll("[data-page]").forEach(button=>button.classList.toggle("active",button.dataset.page===page));
+      const nav= NAV.find(item=>item[2]===page);
+      $("pageTitle").textContent=nav?nav[0]:"FitVerso";
+      if(page==="history") renderHistory();
+      if(page==="progress") renderProgress();
+    }
+    function renderExercises() {
+      const query=$("exerciseSearch").value.trim().toLocaleLowerCase("pt-BR");
+      const group=$("groupFilter").value, level=$("levelFilter").value;
+      const items=EXERCISES.filter(item=>
+        (!query||`${item.name} ${item.group} ${item.text}`.toLocaleLowerCase("pt-BR").includes(query))&&
+        (group==="Todos os grupos"||group===item.group)&&(level==="Todos os níveis"||level===item.level));
+      $("exerciseGrid").innerHTML=items.map(item=>`
+        <article class="card exercise-card"><h3>${escapeHTML(item.name)}</h3>
+        <span class="tag">${escapeHTML(item.group)} · ${escapeHTML(item.level)}</span>
+        <p class="muted">${escapeHTML(item.text)}</p>
+        <button class="btn primary" data-exercise="${item.id}">Treinar</button></article>`).join("")||
+        `<p class="empty">Nenhum exercício corresponde aos filtros.</p>`;
+      $("exerciseGrid").querySelectorAll("[data-exercise]").forEach(button=>button.addEventListener("click",()=>{
+        $("liveExercise").value=button.dataset.exercise; showPage("live");
+      }));
+    }
+    function fillExerciseOptions() {
+      $("liveExercise").innerHTML=EXERCISES.map(item=>`<option value="${item.id}">${item.name}</option>`).join("");
+      $("historyExerciseFilter").innerHTML=`<option value="">Todos os exercícios</option>`+
+        EXERCISES.map(item=>`<option value="${item.id}">${item.name}</option>`).join("");
+    }
+    function renderHistory() {
+      const days=Number($("periodFilter").value), exercise=$("historyExerciseFilter").value;
+      const now=Date.now();
+      const records=[...state.history].reverse().filter(record=>{
+        const time=Date.parse(record.started_at);
+        if(days&&now-time>days*86400000) return false;
+        return !exercise||Number(record.reps_by_exercise?.[exercise]||0)>0;
+      });
+      $("historyRows").innerHTML=records.map(record=>{
+        const exercises=Object.entries(record.reps_by_exercise||{}).filter(([,reps])=>reps>0)
+          .map(([key,reps])=>`${LABELS[key]||key} (${reps})`).join(", ")||"Sessão sem repetições contadas";
+        const date=new Date(record.started_at);
+        return `<tr data-id="${escapeHTML(record.id)}" data-detail="${escapeHTML(exercises)}">
+          <td>${escapeHTML(date.toLocaleString("pt-BR"))}</td><td>${escapeHTML(exercises)}</td>
+          <td>${duration(record.duration_seconds)}</td><td>${Number(record.total_reps)||0}</td></tr>`;
+      }).join("");
+      $("historyEmpty").classList.toggle("hidden",records.length>0);
+      $("historyRows").querySelectorAll("tr").forEach(row=>row.addEventListener("click",()=>{
+        $("historyDetail").textContent=`Exercícios: ${row.dataset.detail}`;
+      }));
+    }
+    function renderDashboard() {
+      const now=Date.now(), weekly=state.history.filter(item=>now-Date.parse(item.started_at)<7*86400000);
+      $("greeting").textContent=`Olá, ${state.profile.name||"Atleta"}! Vamos treinar hoje?`;
+      $("weekSessions").textContent=weekly.length;
+      $("weekGoal").textContent=`Meta: ${state.profile.weekly_goal||3} por semana`;
+      $("weekReps").textContent=weekly.reduce((sum,item)=>sum+(Number(item.total_reps)||0),0);
+      const latest=state.history.at(-1);
+      $("lastWorkout").textContent=latest?new Date(latest.started_at).toLocaleDateString("pt-BR"):"Ainda não";
+      $("lastWorkoutDetail").textContent=latest?`${duration(latest.duration_seconds)} · ${latest.total_reps} repetições`:"Seu histórico aparece aqui";
+    }
+    function renderProgress() {
+      const now=new Date(), cutoff=Date.now()-7*86400000;
+      const weekly=state.history.filter(item=>Date.parse(item.started_at)>=cutoff);
+      $("progressSessions").textContent=weekly.length;
+      $("progressReps").textContent=weekly.reduce((sum,item)=>sum+(Number(item.total_reps)||0),0);
+      $("progressGoal").textContent=`${weekly.length}/${state.profile.weekly_goal||3}`;
+      const days=[];
+      for(let offset=6;offset>=0;offset--){const date=new Date(now);date.setDate(now.getDate()-offset);date.setHours(0,0,0,0);days.push(date);}
+      const counts=days.map(day=>weekly.filter(item=>{
+        const date=new Date(item.started_at);return date.toDateString()===day.toDateString();
+      }).length);
+      const max=Math.max(4,...counts);
+      $("progressChart").innerHTML=days.map((day,index)=>`
+        <div class="bar-item"><div class="bar-track" title="${counts[index]} treino(s)">
+          <div class="bar" style="height:${Math.max(3,counts[index]/max*145)}px"></div></div>
+          <div class="bar-label">${day.toLocaleDateString("pt-BR",{weekday:"short"}).replace(".","")}</div></div>`).join("");
+    }
+    async function refreshHistory() {
+      if(state.supabase) {
+        const {data,error}=await state.supabase.from("workout_sessions")
+          .select("id,started_at,duration_seconds,reps_by_exercise,total_reps")
+          .order("started_at",{ascending:true});
+        if(error) throw error;
+        state.history=data||[];
+        renderDashboard();renderHistory();renderProgress();
+        return;
+      }
+      const response=await api("/api/history"); state.history=await response.json();
+      renderDashboard(); renderHistory(); renderProgress();
+    }
+
+    async function saveWorkout(startedAt,durationSeconds,repsByExercise,recordId=null) {
+      const reps={...repsByExercise};
+      const record={
+        id:recordId||crypto.randomUUID(),
+        user_id:state.user.id,
+        started_at:startedAt,
+        duration_seconds:Math.max(0,Math.round(durationSeconds)),
+        reps_by_exercise:reps,
+        total_reps:Object.values(reps).reduce((sum,value)=>sum+Math.max(0,Number(value)||0),0),
+      };
+      const {error}=await state.supabase.from("workout_sessions").insert(record);
+      if(error) throw error;
+    }
+
+    async function saveCloudSnapshot(snapshot) {
+      const row={
+        user_id:state.user.id,
+        session_id:state.sessionId,
+        captured_at:new Date().toISOString(),
+        timestamp_seconds:snapshot.timestamp_seconds,
+        exercise:snapshot.exercise,
+        reps:snapshot.reps,
+        angle_degrees:snapshot.angle_degrees,
+        joints_2d:snapshot.joints_2d,
+        joints_3d_cam:snapshot.joints_3d_cam,
+      };
+      const {error}=await state.supabase.from("pose_snapshots").insert(row);
+      if(error) throw error;
+    }
+
+    function persistPoseSnapshot(snapshot) {
+      if(state.snapshotWritesFailed) return;
+      const request=state.supabase
+        ?saveCloudSnapshot(snapshot)
+        :api("/api/snapshots",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(snapshot)});
+      request.catch(error=>{
+        state.snapshotWritesFailed=true;
+        notify(`Snapshot não salvo: ${error.message}`,true);
+      });
+    }
+    function setFeedback(message) {
+      const target=$("feedback"); target.textContent=message||"Ajustando pose";
+      target.classList.remove("warn","bad");
+      if(/desça|mais|ajustando/i.test(message||"")) target.classList.add("warn");
+      if(/evite|reduza/i.test(message||"")) target.classList.add("bad");
+    }
+    function setConnection(online) {
+      $("connection").textContent=online?"● Câmera conectada":"● Câmera desconectada";
+      $("connection").classList.toggle("online",online);
+    }
+    function updateFrame(info) {
+      if(info.reps_by_exercise)state.localReps={...info.reps_by_exercise};
+      $("repCount").textContent=String(info.reps||0).padStart(2,"0");
+      $("angleValue").textContent=info.angle==null?"Ângulo: --":`Ângulo: ${Math.round(info.angle)}°`;
+      $("liveTimer").textContent=`${duration(info.elapsed_seconds)} · ${info.fps||0} FPS`;
+      $("liveStatus").textContent=info.person_detected?"Treino ao vivo":"Fique visível para a câmera";
+      setFeedback(info.feedback);
+    }
+    function setLocalVisuals(visible) {
+      $("poseCanvas").classList.toggle("hidden",!visible);
+      $("avatarCanvas").classList.toggle("hidden",!visible);
+      $("coachImage").classList.add("hidden");
+      $("avatarImage").classList.add("hidden");
+      $("coachPlaceholder").classList.toggle("hidden",visible);
+      $("avatarPlaceholder").classList.toggle("hidden",visible);
+    }
+    async function loadLocalCoachScript() {
+      if(window.FitVersoLocalCoach) return;
+      await new Promise((resolve,reject)=>{
+        const script=document.createElement("script");script.src=LOCAL_COACH_SCRIPT;
+        script.onload=resolve;script.onerror=()=>reject(new Error("Não foi possível carregar o coach local."));
+        document.head.append(script);
+      });
+    }
+    async function startLocalWorkout() {
+      state.mode="device";state.startedAt=new Date();state.localReps=Object.fromEntries(EXERCISES.map(item=>[item.id,0]));
+      state.sessionId=crypto.randomUUID();state.snapshotWritesFailed=false;
+      state.lastSnapshotAt=0;state.paused=false;
+      state.stream=await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:{ideal:$("facingMode").value},width:{ideal:640},height:{ideal:480}},audio:false
+      });
+      const video=$("cameraSource");video.srcObject=state.stream;await video.play();
+      await loadLocalCoachScript();
+      setLocalVisuals(true);
+      state.localCoach=new window.FitVersoLocalCoach({
+        video, cameraCanvas:$("poseCanvas"), avatarCanvas:$("avatarCanvas"),
+        exercise:$("liveExercise").value,
+        onFrame:updateFrame,
+        onSnapshot:snapshot=>{
+          if(state.profile.snapshots_enabled===false) return;
+          persistPoseSnapshot(snapshot);
+        },
+        onError:error=>notify(error.message,true)
+      });
+      await state.localCoach.start();
+      state.running=true;
+      $("startButton").disabled=true;$("pauseButton").disabled=false;$("resetButton").disabled=false;$("stopButton").disabled=false;
+      $("pauseButton").textContent="Pausar";$("liveStatus").textContent="Treino local no aparelho";
+      setConnection(true);
+    }
+    function sendFrames() {
+      if(!state.running) return;
+      const now=performance.now(), video=$("cameraSource"), canvas=$("captureCanvas");
+      if(state.socket?.readyState===WebSocket.OPEN&&!state.waiting&&video.readyState>=2&&now-state.lastSent>=50) {
+        state.lastSent=now; canvas.width=640; canvas.height=480;
+        const context=canvas.getContext("2d",{alpha:false});
+        context.fillStyle="#111820";context.fillRect(0,0,canvas.width,canvas.height);
+        const scale=Math.min(canvas.width/video.videoWidth,canvas.height/video.videoHeight);
+        const width=video.videoWidth*scale,height=video.videoHeight*scale;
+        context.drawImage(video,(canvas.width-width)/2,(canvas.height-height)/2,width,height);
+        state.waiting=true;
+        canvas.toBlob(blob=>{
+          if(blob&&state.socket?.readyState===WebSocket.OPEN) state.socket.send(blob);
+          else state.waiting=false;
+        },"image/jpeg",.72);
+      }
+      state.raf=requestAnimationFrame(sendFrames);
+    }
+    function receiveSocketMessage(event) {
+      if(event.data instanceof Blob) {
+        const url=URL.createObjectURL(event.data);
+        if(state.binaryPart===0) {
+          if(state.cameraUrl) URL.revokeObjectURL(state.cameraUrl);
+          state.cameraUrl=url; $("coachImage").src=url;$("coachImage").classList.remove("hidden");$("coachPlaceholder").classList.add("hidden");
+        } else {
+          if(state.avatarUrl) URL.revokeObjectURL(state.avatarUrl);
+          state.avatarUrl=url; $("avatarImage").src=url;$("avatarImage").classList.remove("hidden");$("avatarPlaceholder").classList.add("hidden");
+        }
+        state.binaryPart++;
+        return;
+      }
+      const message=JSON.parse(event.data);
+      if(message.type==="authenticated") {
+        state.socket.send(JSON.stringify({type:"configure",model:state.profile.model||"small",
+          fit:Number(state.profile.fit??1),device:state.profile.device||"cpu",
+          exercise:$("liveExercise").value,snapshots_enabled:state.profile.snapshots_enabled!==false}));
+      } else if(message.type==="ready") {
+        state.running=true;state.waiting=false;state.paused=false;
+        $("startButton").disabled=true;$("pauseButton").disabled=false;$("resetButton").disabled=false;$("stopButton").disabled=false;
+        $("pauseButton").textContent="Pausar";$("liveStatus").textContent=message.message;
+        setConnection(true);sendFrames();
+      } else if(message.type==="frame") {
+        state.binaryPart=0;state.waiting=false;updateFrame(message);
+      } else if(message.type==="status") {
+        $("liveStatus").textContent=message.message;
+      } else if(message.type==="error") {
+        state.waiting=false;state.binaryPart=0;$("liveStatus").textContent=message.message;
+        notify(message.message,true);
+        if(!state.running){cleanupCamera();$("startButton").disabled=false;}
+      } else if(message.type==="stopped") {
+        state.running=false;state.waiting=false;cleanupCamera();setConnection(false);
+        $("startButton").disabled=false;$("pauseButton").disabled=true;$("resetButton").disabled=true;$("stopButton").disabled=true;
+        $("liveStatus").textContent="Treino salvo no histórico.";
+        state.socket.close();state.socket=null;refreshHistory().catch(error=>notify(error.message,true));
+      }
+    }
+    async function startWorkout() {
+      if(state.running) return;
+      if(location.protocol!=="https:"&&!["localhost","127.0.0.1"].includes(location.hostname)) {
+        notify("No celular, a câmera exige HTTPS. Configure um certificado confiável para este endereço.",true);
+        return;
+      }
+      if(!navigator.mediaDevices?.getUserMedia) {
+        notify("Este navegador não liberou a câmera. Abra o app por HTTPS e permita o acesso.",true);return;
+      }
+      $("startButton").disabled=true;$("inferenceMode").disabled=true;
+      $("liveStatus").textContent="Solicitando acesso à câmera…";
+      try {
+        if($("inferenceMode").value==="device") {
+          await startLocalWorkout();
+          return;
+        }
+        state.mode="instanthmr";
+        state.stream=await navigator.mediaDevices.getUserMedia({
+          video:{facingMode:{ideal:$("facingMode").value},width:{ideal:640},height:{ideal:480}},audio:false
+        });
+        const video=$("cameraSource");video.srcObject=state.stream;await video.play();
+        const scheme=location.protocol==="https:"?"wss":"ws";
+        state.socket=new WebSocket(`${scheme}://${location.host}/ws/workout`);
+        state.socket.binaryType="blob";
+        state.socket.onopen=()=>state.socket.send(JSON.stringify({code:state.code}));
+        state.socket.onmessage=receiveSocketMessage;
+        state.socket.onerror=()=>notify("Falha na conexão com o servidor do FitVerso.",true);
+        state.socket.onclose=()=>{
+          if(state.running){state.running=false;cleanupCamera();setConnection(false);}
+          $("startButton").disabled=false;$("pauseButton").disabled=true;$("resetButton").disabled=true;$("stopButton").disabled=true;
+        };
+        $("liveStatus").textContent="Carregando o modelo e preparando o treino…";
+      } catch(error) {
+        cleanupCamera();$("startButton").disabled=false;
+        $("inferenceMode").disabled=false;
+        state.running=false;setConnection(false);setLocalVisuals(false);
+        notify(`Não foi possível iniciar: ${error.message}`,true);
+      }
+    }
+    function cleanupCamera() {
+      cancelAnimationFrame(state.raf);
+      if(state.localCoach){state.localCoach.stop();state.localCoach=null;}
+      if(state.stream) {state.stream.getTracks().forEach(track=>track.stop());state.stream=null;}
+      $("cameraSource").srcObject=null;state.waiting=false;state.binaryPart=0;
+      setLocalVisuals(false);
+      $("inferenceMode").disabled=false;
+    }
+    function stopWorkout() {
+      if(state.mode==="device"&&state.running) {
+        const durationSeconds=(Date.now()-state.startedAt.getTime())/1000;
+        cleanupCamera();state.running=false;setConnection(false);
+        $("startButton").disabled=false;$("pauseButton").disabled=true;$("resetButton").disabled=true;$("stopButton").disabled=true;
+        $("liveStatus").textContent="Salvando treino…";
+          const save=state.supabase
+            ?saveWorkout(state.startedAt.toISOString(),durationSeconds,state.localReps,state.sessionId)
+            :api("/api/workouts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+              started_at:state.startedAt.toISOString(),duration_seconds:durationSeconds,reps_by_exercise:state.localReps
+            })});
+          save.then(()=>refreshHistory()).then(()=>{$("liveStatus").textContent="Treino salvo no histórico.";})
+          .catch(error=>{$("liveStatus").textContent="Não foi possível salvar o treino.";notify(error.message,true);});
+        return;
+      }
+      if(state.socket?.readyState===WebSocket.OPEN) {
+        $("stopButton").disabled=true;$("liveStatus").textContent="Salvando treino…";
+        state.socket.send(JSON.stringify({type:"stop"}));
+      } else cleanupCamera();
+    }
+    function renderModels(models) {
+      state.models=models;
+      $("modelList").innerHTML=models.map(model=>`
+        <article class="card model-card"><div><h3>${escapeHTML(model.name)}</h3>
+          <div class="model-status">${model.downloaded?"Baixado": "Disponível para baixar"} · ${escapeHTML(model.size)}</div>
+          <div class="model-status">Licença: ${escapeHTML(model.license)}</div></div>
+          <button class="btn ${model.id===state.profile.model?"primary":"outline"}" data-model="${escapeHTML(model.id)}">
+            ${model.downloaded?(model.id===state.profile.model?"Em uso":"Selecionar"):"Baixar modelo"}</button></article>`).join("");
+      $("modelList").querySelectorAll("[data-model]").forEach(button=>button.addEventListener("click",()=>modelAction(button.dataset.model)));
+    }
+    async function loadModels() {
+      if(state.supabase) return;
+      if(state.previewMode) {
+        $("modelSelect").innerHTML='<option value="small">Pose Landmarker Lite · neste aparelho</option>';
+        $("modelSelect").disabled=true;$("fitSelect").disabled=true;$("deviceSelect").disabled=true;
+        $("modelList").innerHTML='<article class="card"><p class="muted">A demonstração hospedada usa MediaPipe no navegador. Downloads InstantHMR e processamento em servidor não estão configurados.</p></article>';
+        return;
+      }
+      const fit=Number($("fitSelect").value);
+      const response=await api(`/api/models?fit=${fit}`),models=await response.json();
+      if(!$("modelSelect").options.length) {
+        $("modelSelect").innerHTML=models.map(model=>`<option value="${escapeHTML(model.id)}">${escapeHTML(model.name)}</option>`).join("");
+      }
+      renderModels(models);
+      $("modelSelect").value=state.profile.model||"small";
+    }
+    async function modelAction(model) {
+      const info=state.models.find(item=>item.id===model);
+      if(info?.downloaded) {
+        $("modelSelect").value=model;state.profile.model=model;
+        await saveProfile(false);await loadModels();notify(`${info.name} selecionado para o próximo treino.`);return;
+      }
+      const button=document.querySelector(`[data-model="${CSS.escape(model)}"]`);
+      if(button){button.disabled=true;button.textContent="Baixando…";}
+      try {
+        const response=await api(`/api/models/${encodeURIComponent(model)}/download?fit=${Number($("fitSelect").value)}`,{method:"POST"});
+        const result=await response.json();state.profile.model=model;$("modelSelect").value=model;
+        await saveProfile(false);await loadModels();notify(`${info.name} baixado (${result.size}).`);
+      } catch(error) {notify(error.message,true);if(button){button.disabled=false;button.textContent="Tentar novamente";}}
+    }
+    function applyProfile() {
+      $("profileName").value=state.profile.name||"Atleta";
+      $("weeklyGoalSelect").value=String(state.profile.weekly_goal||3);
+      $("profileCamera").value=state.profile.camera_mode||"user";
+      $("facingMode").value=state.profile.camera_mode||"user";
+      $("snapshotsEnabled").checked=state.profile.snapshots_enabled!==false;
+      $("modelSelect").value=state.profile.model||"small";
+      $("fitSelect").value=String(state.profile.fit??1);
+      $("deviceSelect").value=state.profile.device||"cpu";
+      $("liveExercise").value=state.profile.exercise||"squat";
+      $("inferenceMode").value=state.supabase?"device":(state.profile.inference_mode||"device");
+      $("profileName").value=state.profile.name||"Atleta";
+    }
+    async function saveProfile(showMessage=true) {
+      const data={
+        name:$("profileName").value.trim()||"Atleta",
+        weekly_goal:Number($("weeklyGoalSelect").value),
+        model:$("modelSelect").value,
+        fit:Number($("fitSelect").value),
+        device:$("deviceSelect").value,
+        camera_mode:$("profileCamera").value,
+        snapshots_enabled:$("snapshotsEnabled").checked,
+        inference_mode:$("inferenceMode").value,
+      };
+      if(state.supabase) {
+        const {error}=await state.supabase.from("profiles").upsert(
+          {id:state.user.id,...data,updated_at:new Date().toISOString()},
+          {onConflict:"id"},
+        );
+        if(error) throw error;
+        state.profile={...state.profile,...data};renderDashboard();
+        if(showMessage)notify("Preferências salvas na sua conta.");
+        return;
+      }
+      const response=await api("/api/profile",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+      await response.json();state.profile={...state.profile,...data};renderDashboard();
+      if(showMessage)notify("Preferências salvas.");
+    }
+    async function downloadFile(path,filename) {
+      const response=await api(path);const blob=await response.blob();
+      const url=URL.createObjectURL(blob),anchor=document.createElement("a");
+      anchor.href=url;anchor.download=filename;anchor.click();URL.revokeObjectURL(url);
+    }
+
+    function downloadBlob(blob,filename) {
+      const url=URL.createObjectURL(blob),anchor=document.createElement("a");
+      anchor.href=url;anchor.download=filename;anchor.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    }
+
+    async function downloadCsv() {
+      if(!state.supabase) return downloadFile("/api/export.csv","fitverso-treinos.csv");
+      const columns=["id","started_at","duration_seconds","total_reps","reps_by_exercise"];
+      const quote=value=>`"${String(value??"").replaceAll('"','""')}"`;
+      const lines=[columns.map(quote).join(",")];
+      for(const row of state.history) lines.push(columns.map(column=>
+        quote(column==="reps_by_exercise"?JSON.stringify(row[column]||{}):row[column])).join(","));
+      downloadBlob(new Blob(["\uFEFF"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}),"fitverso-treinos.csv");
+    }
+
+    async function exportUserData() {
+      if(state.previewMode) {
+        downloadBlob(new Blob([JSON.stringify({
+          exported_at:new Date().toISOString(),
+          profile:state.profile,
+          workouts:state.history,
+          snapshots:previewRead(PREVIEW_SNAPSHOTS_KEY,[]),
+        },null,2)],{type:"application/json"}),"fitverso-dados.json");
+        return;
+      }
+      if(!state.supabase) return downloadFile("/api/export","fitverso-dados.zip");
+      const snapshots=[];
+      for(let offset=0;;offset+=1000) {
+        const {data,error}=await state.supabase.from("pose_snapshots")
+          .select("session_id,captured_at,timestamp_seconds,exercise,reps,angle_degrees,joints_2d,joints_3d_cam")
+          .order("captured_at",{ascending:true}).range(offset,offset+999);
+        if(error) throw error;
+        snapshots.push(...data);
+        if(data.length<1000) break;
+      }
+      downloadBlob(new Blob([JSON.stringify({
+        exported_at:new Date().toISOString(),profile:state.profile,
+        workouts:state.history,snapshots,
+      },null,2)],{type:"application/json"}),"fitverso-dados.json");
+    }
+
+    async function login(code) {
+      state.code=code;
+      const response=await api("/api/ping");await response.json();
+      sessionStorage.setItem("fitverso-code",code);
+      $("loginShade").classList.add("hidden");
+      const [profileResponse,historyResponse]=await Promise.all([api("/api/profile"),api("/api/history")]);
+      state.profile=await profileResponse.json();state.history=await historyResponse.json();
+      applyProfile();renderDashboard();renderExercises();renderHistory();renderProgress();
+      await loadModels();
+    }
+    function setupEvents() {
+      $("loginForm").addEventListener("submit",async event=>{
+        event.preventDefault();$("loginError").textContent="";
+        try {
+          if(state.supabase) await signInSupabase($("authEmail").value.trim(),$("authPassword").value);
+          else await login($("accessCode").value.trim());
+        }
+        catch(error){$("loginError").textContent=error.message;}
+      });
+      $("createAccount").addEventListener("click",async()=>{
+        $("loginError").textContent="";
+        try {await createSupabaseAccount($("authEmail").value.trim(),$("authPassword").value);}
+        catch(error){$("loginError").textContent=error.message;}
+      });
+      $("exerciseSearch").addEventListener("input",renderExercises);
+      $("groupFilter").addEventListener("change",renderExercises);
+      $("levelFilter").addEventListener("change",renderExercises);
+      $("periodFilter").addEventListener("change",renderHistory);
+      $("historyExerciseFilter").addEventListener("change",renderHistory);
+      $("startButton").addEventListener("click",startWorkout);
+      $("stopButton").addEventListener("click",stopWorkout);
+      $("pauseButton").addEventListener("click",()=>{
+        state.paused=!state.paused;$("pauseButton").textContent=state.paused?"Continuar":"Pausar";
+        if(state.localCoach)state.localCoach.setPaused(state.paused);
+        if(state.socket?.readyState===WebSocket.OPEN)state.socket.send(JSON.stringify({type:"pause",paused:state.paused}));
+      });
+      $("resetButton").addEventListener("click",()=>{
+        if(state.localCoach)state.localCoach.reset();
+        if(state.socket?.readyState===WebSocket.OPEN)state.socket.send(JSON.stringify({type:"reset"}));
+      });
+      $("liveExercise").addEventListener("change",()=>{
+        if(state.localCoach)state.localCoach.setExercise($("liveExercise").value);
+        if(state.socket?.readyState===WebSocket.OPEN)state.socket.send(JSON.stringify({type:"exercise",exercise:$("liveExercise").value}));
+      });
+      $("inferenceMode").addEventListener("change",()=>{
+        if(!state.running) state.profile.inference_mode=$("inferenceMode").value;
+        const isLocal=$("inferenceMode").value==="device";
+        $("liveStatus").textContent=isLocal?
+          "A câmera e a pose serão processadas neste aparelho.":"O servidor executa o InstantHMR; GPU é opcional, conforme a configuração.";
+      });
+      $("facingMode").addEventListener("change",()=>{$("profileCamera").value=$("facingMode").value;});
+      $("saveModelSettings").addEventListener("click",async()=>{
+        try {await saveProfile();await loadModels();}catch(error){notify(error.message,true);}
+      });
+      $("fitSelect").addEventListener("change",()=>loadModels().catch(error=>notify(error.message,true)));
+      $("saveProfile").addEventListener("click",()=>saveProfile().catch(error=>notify(error.message,true)));
+      $("csvButton").addEventListener("click",()=>downloadCsv().catch(error=>notify(error.message,true)));
+      $("exportData").addEventListener("click",()=>exportUserData().catch(error=>notify(error.message,true)));
+      $("deleteData").addEventListener("click",async()=>{
+        const prompt=state.previewMode
+          ?"Isso apagará os treinos e snapshots guardados neste navegador. As preferências serão mantidas. Continuar?"
+          :state.supabase
+          ?"Isso apagará seus treinos e snapshots da sua conta Supabase. As preferências serão mantidas. Continuar?"
+          :"Isso apagará o histórico e os snapshots armazenados no computador servidor. Modelos e preferências serão mantidos. Continuar?";
+        if(!confirm(prompt))return;
+        try {
+          if(state.supabase) {
+            const snapshots=await state.supabase.from("pose_snapshots").delete().eq("user_id",state.user.id);
+            if(snapshots.error) throw snapshots.error;
+            const workouts=await state.supabase.from("workout_sessions").delete().eq("user_id",state.user.id);
+            if(workouts.error) throw workouts.error;
+          } else await api("/api/data",{method:"DELETE"});
+          state.history=[];renderDashboard();renderHistory();renderProgress();notify("Histórico e snapshots excluídos.");
+        }
+        catch(error){notify(error.message,true);}
+      });
+      $("signOutButton").addEventListener("click",async()=>{
+        if(!state.supabase) return;
+        const {error}=await state.supabase.auth.signOut();
+        if(error) {notify(error.message,true);return;}
+        state.user=null;state.history=[];state.profile={};
+        $("loginError").textContent="";$("loginShade").classList.remove("hidden");
+      });
+    }
+    initializeApp().catch(error=>{
+      $("loginShade").classList.remove("hidden");
+      $("loginError").textContent=error.message;
+    });
+  </script>
+</body>
+</html>
